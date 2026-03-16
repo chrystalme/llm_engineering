@@ -14,9 +14,12 @@ Multi-agent pipeline that monitors commodities, stocks, indices, and crypto; run
 
 ```bash
 cd week8/community_contributions/chrys
-pip install -r requirements.txt
+uv venv
+source .venv/bin/activate   # on Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your API keys (Pushover, Alpha Vantage, CommodityPriceAPI, NewsAPI, OpenRouter).
+# First time with Modal: modal setup   (or modal token new)
 ```
 
 ## Run
@@ -39,6 +42,28 @@ cp .env.example .env
   ```bash
   python main.py schedule
   ```
+
+## Deploy pipeline to Modal (optional)
+
+Run the full pipeline on Modal so you only need the notebook + Gradio UI locally.
+
+**Requires:** `modal` CLI. If you get `command not found: modal`, run `uv pip install -r requirements.txt` in your activated venv (see Setup), then run `modal` from that same shell.
+
+1. **Create a Modal secret** with your API keys (in [Modal dashboard](https://modal.com) or CLI):
+   ```bash
+   modal secret create aria-env \
+     ALPHA_VANTAGE_API_KEY=... \
+     COMMODITY_PRICE_API_KEY=... \
+     NEWSAPI_KEY=... \
+     PUSHOVER_USER=... \
+     PUSHOVER_TOKEN=... \
+     OPENROUTER_API_KEY=...
+   ```
+2. **Deploy** from the `chrys` directory:
+   ```bash
+   cd week8/community_contributions/chrys && modal deploy aria_modal.py
+   ```
+3. **Use in the notebook or app:** set `USE_MODAL=1` (e.g. in a notebook cell: `os.environ["USE_MODAL"] = "1"`) before launching the Gradio app. "Run pipeline" will call the deployed function; results appear in the table and are logged locally to `data/aria_audit.db`. Agent log stream is shown when running locally; with Modal you still get the results table.
 
 ## Config
 

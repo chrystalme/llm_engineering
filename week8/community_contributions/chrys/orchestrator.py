@@ -15,7 +15,7 @@ from config import (
 )
 
 
-def run_pipeline() -> Tuple[List[DecisionRecord], List[AssetData]]:
+def run_pipeline(skip_db: bool = False) -> Tuple[List[DecisionRecord], List[AssetData]]:
     watchlist = get_watchlist()
     # 1. Data Fetcher
     fetcher = DataFetcherAgent(alpha_key=ALPHA_VANTAGE_API_KEY, metals_key=COMMODITY_PRICE_API_KEY)
@@ -56,6 +56,7 @@ def run_pipeline() -> Tuple[List[DecisionRecord], List[AssetData]]:
         to_send_tuples.append((rec, tech, sent, ad))
     notifier.run(to_send_tuples)
 
-    # Audit log
-    log_decisions(records)
+    # Audit log (skipped when running on Modal; client can log locally from returned data)
+    if not skip_db:
+        log_decisions(records)
     return records, asset_data

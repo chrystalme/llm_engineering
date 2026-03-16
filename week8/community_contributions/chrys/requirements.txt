@@ -6,3 +6,5 @@ numpy
 apscheduler
 gradio
 litellm
+modal
+yfinance
